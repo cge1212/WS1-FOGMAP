@@ -1,25 +1,26 @@
 const defaultPosition = [13.38, 52.51];
 const radiusMask_lower = 200;
-const radiusMask_upper = 1.2*radiusMask_lower;
+const radiusMask_upper = 228;
 
 const configLowerMask = {
   innerRadius: radiusMask_lower,
-  color: 'hsl(35, 100%, 50%)',
-  ringCount: 4,
-  ringWidth: 10,
-  opacities: [0.2, 0.4, 0.6, 0.8]
+  color: 'hsl(0, 0.00%, 0.00%)',
+  ringCount: 3,
+  ringWidth: 7,
+  opacities: [0.2, 0.4, 0.6]
+  //opacities: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 };
 
 const configUpperMask = {
   innerRadius: radiusMask_upper,
-  color: 'hsl(231, 100%, 50%)',
+  color: 'hsl(37, 94.00%, 45.90%)',
   ringCount: 4,
-  ringWidth: 10,
+  ringWidth: 7,
   opacities: [0.2, 0.4, 0.6, 0.8]
 };
 
 map = new maplibregl.Map({
-  style: "../STYLES/tiles_symbology.json",
+  style: "../STYLES/tiles_sym_Google.json",
   center: defaultPosition,
   zoom: 15.5,
   pitch: 45,
@@ -154,7 +155,7 @@ map.on('load', () => {
       "fill-extrusion-base": ["get", "render_min_height"],
       "fill-extrusion-color": "hsl(35,8%,85%)",
       "fill-extrusion-height": ["get", "render_height"],
-      "fill-extrusion-opacity": 0.8
+      "fill-extrusion-opacity": 1
     }
   });
 
@@ -177,7 +178,7 @@ map.on('load', () => {
     source: 'mask_lower',
     paint: {
       'fill-color': ['get', 'fill'],       // Use the fill color from feature properties
-      'fill-opacity': 1,                   // Full opacity — actual transparency comes from RGBA in 'fill'
+      'fill-opacity': 0.7,                   // Full opacity — actual transparency comes from RGBA in 'fill'
       'fill-outline-color': 'rgba(0,0,0,0)' // Make sure no dark outline appears
     }
   }, 'building-3d');
@@ -193,7 +194,7 @@ map.on('load', () => {
     source: 'mask_upper',
     paint: {
       'fill-color': ['get', 'fill'],
-      'fill-opacity': 1,
+      'fill-opacity': 0.99,
       'fill-outline-color': 'rgba(0,0,0,0)'
     }
   });

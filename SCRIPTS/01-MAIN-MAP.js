@@ -105,7 +105,7 @@ function initializeMap(center) {
         "minzoom": 14,
         "paint": {
           "fill-extrusion-base": ["get", "render_min_height"],
-          "fill-extrusion-color": "hsl(35,8%,85%)",
+          "fill-extrusion-color": "hsl(228,12.2%,92%)",
           "fill-extrusion-height": ["get", "render_height"],
           "fill-extrusion-opacity": 0.8
         }

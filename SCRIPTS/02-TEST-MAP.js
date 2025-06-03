@@ -13,17 +13,18 @@ const configLowerMask = {
 
 const configUpperMask = {
   innerRadius: radiusMask_upper,
-  color: 'hsl(37, 94.00%, 45.90%)',
+  color: 'hsl(51, 79.50%, 82.70%)',
   ringCount: 4,
   ringWidth: 7,
   opacities: [0.2, 0.4, 0.6, 0.8]
 };
 
 map = new maplibregl.Map({
-  style: "../STYLES/tiles_sym_Google.json",
+  //style: "../STYLES/tiles_sym_Google.json",
+  style: "../STYLES/tiles_sym_Dark.json",
   center: defaultPosition,
   zoom: 15.5,
-  pitch: 45,
+  pitch: 0,
   bearing: -17.6,
   container: 'map',
   canvasContextAttributes: { antialias: true }
@@ -194,7 +195,7 @@ map.on('load', () => {
     source: 'mask_upper',
     paint: {
       'fill-color': ['get', 'fill'],
-      'fill-opacity': 0.99,
+      'fill-opacity': 0.98,
       'fill-outline-color': 'rgba(0,0,0,0)'
     }
   });

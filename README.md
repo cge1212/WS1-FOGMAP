@@ -1,4 +1,4 @@
-This repository contains the files for the construction of my thesis web application.
+This repository contains the files for the construction of my web application.
 ---
 The folders contain my 
 

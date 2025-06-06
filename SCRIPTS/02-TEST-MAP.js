@@ -1,4 +1,4 @@
-const defaultPosition = [13.38, 52.51];
+const defaultPosition = [8.507, 47.408];
 const radiusMask_lower = 200;
 const radiusMask_upper = 228;
 
@@ -20,8 +20,8 @@ const configUpperMask = {
 };
 
 map = new maplibregl.Map({
-  //style: "../STYLES/tiles_sym_Google.json",
-  style: "../STYLES/tiles_sym_Dark.json",
+  style: "../STYLES/tiles_sym_Google.json",
+  //style: "../STYLES/tiles_sym_Dark.json",
   center: defaultPosition,
   zoom: 15.5,
   pitch: 0,

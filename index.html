@@ -3,42 +3,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Circle Link Page</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f5f5f5; /* optional background */
-        }
-        .circle {
-            width: 14rem;
-            height: 14rem;
-            background-color: hsl(51, 79.5%, 82.7%);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* optional shadow */
-            font-family: Verdana, sans-serif;;
-            font-size: 1rem;
-        }
-        .circle a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
-        .circle a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>welcome</title>
+    <link rel="stylesheet" href="STYLES/index_style.css" />
 </head>
 <body>
-    <div class="circle">
-        <a href="SITES/map.html">enter map</a>
+    <div class="circle" id="circle">
+        <div class="circle-bg" id="circleBg"></div>
+        <a href="SITES/map.html" id="circleLink">enter map</a>
     </div>
+
+    <script src="SCRIPTS/index_script.js"></script>
 </body>
 </html>

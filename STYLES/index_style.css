@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F8F7F7;
+}
+
+.circle {
+    position: relative;
+    width: 7rem;
+    height: 7rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Verdana, sans-serif;
+    font-size: 1rem;
+}
+
+/* Circle background */
+.circle-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: hsl(51, 79.5%, 82.7%);
+    border-radius: 50%;
+    z-index: 0;
+    transition: transform 5s ease-in-out;
+    transform: scale(1); /* default */
+}
+
+/* Enlarged state */
+.circle-bg.enlarged {
+    transform: scale(10);
+}
+
+.circle a {
+    position: relative;
+    z-index: 1;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.circle a:hover {
+    text-decoration: underline;
+}

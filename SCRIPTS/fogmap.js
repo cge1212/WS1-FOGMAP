@@ -266,6 +266,7 @@ searchInput.addEventListener('input', () => {
   // Watch user location
   const watchId = navigator.geolocation.watchPosition(
     (position) => {
+      console.log("Location retrieved", position);
       const { latitude, longitude } = position.coords;
       const currentLocation = [longitude, latitude];
 
@@ -318,6 +319,7 @@ searchInput.addEventListener('input', () => {
 
     },
     (error) => {
+      alert("Location error: " + error.message);
       console.error("Error tracking location:", error);
     },
     {

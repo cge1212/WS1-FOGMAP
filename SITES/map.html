@@ -6,7 +6,6 @@
   <meta charset='utf-8'>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.4.0/dist/maplibre-gl.css' />
-  <!--<link rel='stylesheet' href='style_map.css' />-->
   <script src='https://unpkg.com/maplibre-gl@5.4.0/dist/maplibre-gl.js'></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
@@ -16,10 +15,15 @@
       html, body, #map { height: 100%; }
   </style>
   <link rel="stylesheet" href="../STYLES/UserMarker.css">
+  <link rel="stylesheet" href="../STYLES/navigation.css">
 
-  <script src="../SCRIPTS/02-TEST-MAP.js" defer></script>
+  <script src="../SCRIPTS/fogmap.js" defer></script>
 </head>
 <body>
+<div class="search-box">
+  <input type="text" id="search-input" placeholder="Search..." />
+  <div id="suggestions" class="suggestions"></div>
+</div>
 <div id="map"></div>
 </body>
 </html>

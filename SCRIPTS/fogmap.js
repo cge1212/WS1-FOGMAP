@@ -1,6 +1,8 @@
 const defaultPosition = [8.507, 47.408];
 const radiusMask_lower = 200;
 const radiusMask_upper = 228;
+const navMarker_dist = (radiusMask_lower + 40)/1000;
+
 
 const configLowerMask = {
   innerRadius: radiusMask_lower,
@@ -143,6 +145,44 @@ function createFadeMask(center, config) {
 map.on('load', () => {
   console.log("Map loaded");
 
+const searchInput = document.getElementById('search-input');
+const suggestionsDiv = document.getElementById('suggestions');
+let searchTimeout;
+let directionSourceId = 'direction-point';
+let directionLayerId = 'direction-layer';
+let targetLocation = null;
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const query = searchInput.value.trim();
+  if (query.length < 3) {
+    suggestionsDiv.innerHTML = '';
+    return;
+  }
+
+  searchTimeout = setTimeout(() => {
+    fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`)
+      .then(res => res.json())
+      .then(data => {
+        suggestionsDiv.innerHTML = '';
+        data.features.forEach(feature => {
+          const el = document.createElement('div');
+          el.className = 'suggestion';
+          el.textContent = feature.properties.name + ', ' + (feature.properties.city || feature.properties.country || '');
+          el.addEventListener('click', () => {
+            const [targetLng, targetLat] = feature.geometry.coordinates;
+            targetLocation = [targetLng, targetLat]; // Store globally
+
+            suggestionsDiv.innerHTML = '';
+            searchInput.value = el.textContent;
+          });    
+          suggestionsDiv.appendChild(el);
+        });
+      });
+  }, 300);
+});
+
+
   let currentLocation = defaultPosition; 
 
   // Add 3D buildings layer
@@ -200,6 +240,27 @@ map.on('load', () => {
     }
   });
 
+  map.addSource(directionSourceId, {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: []
+    }
+  });
+
+  map.addLayer({
+    id: directionLayerId,
+    type: 'circle',
+    source: directionSourceId,
+    paint: {
+      'circle-radius': 80, 
+      'circle-color': 'blue',
+      'circle-opacity': 0.5,
+      'circle-stroke-width': 0,
+      'circle-blur': 0.3
+    }
+  }, 'mask-layer-upper');
+
   let hasCentered = false; // Track whether we've already centered the map
 
   // Watch user location
@@ -225,6 +286,36 @@ map.on('load', () => {
       if (upperMaskSource) {
         upperMaskSource.setData(createFadeMask(currentLocation, configUpperMask));
       }
+
+      if (targetLocation) {
+        const distance = turf.distance(currentLocation, targetLocation, { units: 'kilometers' });
+
+        let markerPosition;
+        if (distance <= navMarker_dist) {
+          markerPosition = targetLocation;
+        } else {
+          const bearing = turf.bearing(currentLocation, targetLocation);
+          const offset = turf.destination(currentLocation, navMarker_dist, bearing, { units: 'kilometers' });
+          markerPosition = offset.geometry.coordinates;
+        }
+
+        const directionSource = map.getSource(directionSourceId);
+        if (directionSource) {
+          directionSource.setData({
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: markerPosition
+                }
+              }
+            ]
+          });
+        }
+      }
+
     },
     (error) => {
       console.error("Error tracking location:", error);

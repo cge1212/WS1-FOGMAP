@@ -1,0 +1,35 @@
+.search-box {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background: white;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+}
+
+.search-box input {
+  width: 250px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.suggestions {
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 4px;
+  border-radius: 3px;
+}
+
+.suggestion {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background-color: #f0f0f0;
+}

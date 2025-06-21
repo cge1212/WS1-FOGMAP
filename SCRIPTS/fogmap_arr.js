@@ -3,9 +3,6 @@ const radiusMask_lower = 150;
 const radiusMask_upper = 178;
 const navMarker_dist = (radiusMask_lower + 45)/1000;
 
-// toggles
-import styleGM from '../STYLES/tiles_sym_Google.json' assert { type: 'json' };
-import styleDark from '../STYLES/tiles_sym_Dark.json' assert { type: 'json' };
 // GM as default
 let currentStyle = styleGM;
 

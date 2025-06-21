@@ -385,24 +385,31 @@ searchInput.addEventListener('input', () => {
             if (heading == null || isNaN(heading)) return;
 
             const userPos = userMarker.getLngLat();
-            const bearing = 360 - heading;
-            const length = 0.05;
+            const bearing = heading; // Use heading directly, no need to subtract from 360
+            const length = 0.04; // smaller main triangle length (~20m)
+            const widthFactor = 0.3; // reduce side width (smaller triangle)
 
+            // Center point
             const center = [userPos.lng, userPos.lat];
+
+            // Forward tip of the triangle
             const point1 = turf.destination(center, length, bearing, { units: 'kilometers' }).geometry.coordinates;
-            const point2 = turf.destination(center, length * 0.4, bearing + 90, { units: 'kilometers' }).geometry.coordinates;
-            const point3 = turf.destination(center, length * 0.4, bearing - 90, { units: 'kilometers' }).geometry.coordinates;
+
+            // Base left and right points (relative to forward direction)
+            const point2 = turf.destination(center, length * widthFactor, bearing + 135, { units: 'kilometers' }).geometry.coordinates;
+            const point3 = turf.destination(center, length * widthFactor, bearing - 135, { units: 'kilometers' }).geometry.coordinates;
 
             const triangle = {
-                type: 'FeatureCollection',
-                features: [{
-                    type: 'Feature',
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [[point1, point2, point3, point1]]
-                    }
-                }]
+            type: 'FeatureCollection',
+            features: [{
+                type: 'Feature',
+                geometry: {
+                type: 'Polygon',
+                coordinates: [[point1, point2, point3, point1]]
+                }
+            }]
             };
+
 
             map.getSource('heading-triangle')?.setData(triangle);
         });

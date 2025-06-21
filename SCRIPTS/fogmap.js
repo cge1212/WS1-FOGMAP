@@ -1,6 +1,6 @@
 const defaultPosition = [8.507, 47.408];
-const radiusMask_lower = 200;
-const radiusMask_upper = 228;
+const radiusMask_lower = 150;
+const radiusMask_upper = 178;
 const navMarker_dist = (radiusMask_lower + 45)/1000;
 
 // toggles

@@ -1,11 +1,12 @@
 const defaultPosition = [8.507, 47.408];
-const radiusMask_lower = 200;
-const radiusMask_upper = 228;
-const navMarker_dist = (radiusMask_lower + 45) / 1000;
+const radiusMask_lower = 150;
+const radiusMask_upper = 178;
+const navMarker_dist = (radiusMask_lower + 45)/1000;
 
-// Style toggle
+// toggles
 const styleGM = "../STYLES/tiles_sym_Google.json";
 const styleDark = "../STYLES/tiles_sym_Dark.json";
+// GM as default
 let currentStyle = styleGM;
 
 const configLowerMask = {
@@ -14,6 +15,7 @@ const configLowerMask = {
   ringCount: 3,
   ringWidth: 7,
   opacities: [0.2, 0.4, 0.6]
+  //opacities: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 };
 
 const configUpperMask = {
@@ -24,7 +26,6 @@ const configUpperMask = {
   opacities: [0.2, 0.4, 0.6, 0.8]
 };
 
-// Initialize map
 const map = new maplibregl.Map({
   style: currentStyle,
   center: defaultPosition,
@@ -46,6 +47,10 @@ toggleBtn.addEventListener('click', () => {
   currentStyle = currentStyle === styleGM ? styleDark : styleGM;
   map.setStyle(currentStyle);
   updateIndicator();
+
+  map.once('styledata', () => {
+    addCustomLayers(map);
+  });
 });
 
 function createMaskGeoJSON(center, radiusInMeter) {
@@ -71,20 +76,25 @@ function createMaskGeoJSON(center, radiusInMeter) {
 }
 
 function parseHslColor(hsl) {
-  const match = hsl.match(/^hsl\(\s*([\d.]+),\s*([\d.]+)%,\s*([\d.]+)%\)$/i);
-  if (match) {
-    return {
-      h: parseFloat(match[1]),
-      s: parseFloat(match[2]),
-      l: parseFloat(match[3])
-    };
+  if (typeof hsl === 'string') {
+    const match = hsl.match(/^hsl\(\s*([\d.]+),\s*([\d.]+)%,\s*([\d.]+)%\)$/i);
+    if (match) {
+      return {
+        h: parseFloat(match[1]),
+        s: parseFloat(match[2]),
+        l: parseFloat(match[3])
+      };
+    } else {
+      console.warn('Invalid HSL string format. Expected format: hsl(h, s%, l%)');
+      return { h: 0, s: 0, l: 0 }; // fallback to black
+    }
   }
-  console.warn('Invalid HSL format');
-  return { h: 0, s: 0, l: 0 };
+  return hsl; // already an object
 }
 
 function hslToRgb(h, s, l) {
-  s /= 100; l /= 100;
+  s /= 100;
+  l /= 100;
   const k = n => (n + h / 30) % 12;
   const a = s * Math.min(l, 1 - l);
   const f = n =>
@@ -103,6 +113,7 @@ function createFadeMask(center, config) {
 
   const hsl = parseHslColor(color);
   const rgb = hslToRgb(hsl.h, hsl.s, hsl.l);
+
   const features = [];
   const steps = 64;
 
@@ -146,7 +157,10 @@ function createFadeMask(center, config) {
     }
   });
 
-  return { type: 'FeatureCollection', features };
+  return {
+    type: 'FeatureCollection',
+    features
+  };
 }
 
 function addCustomLayers(map) {
@@ -218,60 +232,86 @@ function addCustomLayers(map) {
       'circle-blur': 0.3
     }
   }, 'mask-layer-upper');
-}
 
-const userMarkerEl = document.createElement('div');
-userMarkerEl.className = 'user-marker';
-const userMarker = new maplibregl.Marker({ element: userMarkerEl })
-  .setLngLat(defaultPosition)
-  .addTo(map);
+  map.addSource('heading-triangle', {
+        type: 'geojson',
+        data: {
+            type: 'FeatureCollection',
+            features: []
+        }
+    });
+
+    map.addLayer({
+        id: 'heading-triangle-layer',
+        type: 'fill',
+        source: 'heading-triangle',
+        paint: {
+            'fill-color': 'rgba(0, 102, 255, 0.6)',
+            'fill-outline-color': 'rgba(0, 102, 255, 0.9)'
+        }
+    });
+}
 
 map.on('load', () => {
   console.log("Map loaded");
   addCustomLayers(map);
 
-  const searchInput = document.getElementById('search-input');
-  const suggestionsDiv = document.getElementById('suggestions');
-  let searchTimeout;
-  let targetLocation = null;
+const searchInput = document.getElementById('search-input');
+const suggestionsDiv = document.getElementById('suggestions');
+let searchTimeout;
+let directionSourceId = 'direction-point';
+let targetLocation = null;
 
-  searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimeout);
-    const query = searchInput.value.trim();
-    if (query.length < 3) {
-      suggestionsDiv.innerHTML = '';
-      return;
-    }
+searchInput.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  const query = searchInput.value.trim();
+  if (query.length < 3) {
+    suggestionsDiv.innerHTML = '';
+    return;
+  }
 
-    searchTimeout = setTimeout(() => {
-      fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`)
-        .then(res => res.json())
-        .then(data => {
-          suggestionsDiv.innerHTML = '';
-          data.features.forEach(feature => {
-            const el = document.createElement('div');
-            el.className = 'suggestion';
-            el.textContent = feature.properties.name + ', ' + (feature.properties.city || feature.properties.country || '');
-            el.addEventListener('click', () => {
-              const [lng, lat] = feature.geometry.coordinates;
-              targetLocation = [lng, lat];
-              suggestionsDiv.innerHTML = '';
-              searchInput.value = el.textContent;
-            });
-            suggestionsDiv.appendChild(el);
-          });
+  searchTimeout = setTimeout(() => {
+    fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`)
+      .then(res => res.json())
+      .then(data => {
+        suggestionsDiv.innerHTML = '';
+        data.features.forEach(feature => {
+          const el = document.createElement('div');
+          el.className = 'suggestion';
+          el.textContent = feature.properties.name + ', ' + (feature.properties.city || feature.properties.country || '');
+          el.addEventListener('click', () => {
+            const [targetLng, targetLat] = feature.geometry.coordinates;
+            targetLocation = [targetLng, targetLat]; // Store globally
+
+            suggestionsDiv.innerHTML = '';
+            searchInput.value = el.textContent;
+          });    
+          suggestionsDiv.appendChild(el);
         });
-    }, 300);
-  });
+      });
+  }, 300);
+});
 
-  let hasCentered = false;
+  // User marker
+  const userMarkerEl = document.createElement('div');
+  userMarkerEl.className = 'user-marker';
 
+  const userMarker = new maplibregl.Marker({ element: userMarkerEl })
+  .setLngLat(defaultPosition)
+  .addTo(map);
+
+  let hasCentered = false; // Track whether we've already centered the map
+
+  // Watch user location
   navigator.geolocation.watchPosition(
-    (pos) => {
-      const { latitude, longitude } = pos.coords;
+    (position) => {
+      console.log("Location retrieved", position);
+      const { latitude, longitude } = position.coords;
       const currentLocation = [longitude, latitude];
+
       userMarker.setLngLat(currentLocation);
 
+      // Center only once on first position fix
       if (!hasCentered) {
         map.setCenter(currentLocation);
         hasCentered = true;
@@ -289,70 +329,82 @@ map.on('load', () => {
 
       if (targetLocation) {
         const distance = turf.distance(currentLocation, targetLocation, { units: 'kilometers' });
-        let markerPosition = distance <= navMarker_dist
-          ? targetLocation
-          : turf.destination(currentLocation, navMarker_dist, turf.bearing(currentLocation, targetLocation), { units: 'kilometers' }).geometry.coordinates;
 
-        const directionSource = map.getSource('direction-point');
+        let markerPosition;
+        if (distance <= navMarker_dist) {
+          markerPosition = targetLocation;
+        } else {
+          const bearing = turf.bearing(currentLocation, targetLocation);
+          const offset = turf.destination(currentLocation, navMarker_dist, bearing, { units: 'kilometers' });
+          markerPosition = offset.geometry.coordinates;
+        }
+
+        const directionSource = map.getSource(directionSourceId);
         if (directionSource) {
           directionSource.setData({
             type: 'FeatureCollection',
-            features: [{
-              type: 'Feature',
-              geometry: { type: 'Point', coordinates: markerPosition }
-            }]
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'Point',
+                  coordinates: markerPosition
+                }
+              }
+            ]
           });
         }
       }
+
     },
-    (err) => {
-      alert("Location error: " + err.message);
-      console.error("Geolocation error:", err);
+    (error) => {
+      alert("Location error: " + error.message);
+      console.error("Error tracking location:", error);
     },
-    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-  );
-});
-
-// Reapply layers on style switch
-map.on('styledata', () => {
-  console.log("Style changed — reapplying custom layers");
-
-  // Re-add layers and sources
-  addCustomLayers(map);
-
-  // Re-add user marker if removed
-  if (!document.querySelector('.user-marker')) {
-    const userMarkerEl = document.createElement('div');
-    userMarkerEl.className = 'user-marker';
-    userMarker.setElement(userMarkerEl);
-    userMarker.addTo(map);
-  }
-
-  // Restore direction-point source with empty data if missing
-  if (!map.getSource('direction-point')) {
-    map.addSource('direction-point', {
-      type: 'geojson',
-      data: {
-        type: 'FeatureCollection',
-        features: []
-      }
+    {
+      enableHighAccuracy: true,
+      timeout: 8000,
+      maximumAge: 0
     });
-  }
 
-  // Restore the direction-layer
-  if (!map.getLayer('direction-layer')) {
-    map.addLayer({
-      id: 'direction-layer',
-      type: 'circle',
-      source: 'direction-point',
-      paint: {
-        'circle-radius': 80,
-        'circle-color': 'blue',
-        'circle-opacity': 0.3,
-        'circle-stroke-width': 0,
-        'circle-blur': 0.3
-      }
-    }, 'mask-layer-upper'); // make sure this layer is added above your masks
-  }
+  if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
+        document.body.addEventListener('click', () => {
+            DeviceOrientationEvent.requestPermission().then(result => {
+                if (result === 'granted') {
+                    setupDeviceOrientation();
+                }
+            }).catch(console.error);
+        });
+    } else {
+        setupDeviceOrientation();
+    }
+
+    function setupDeviceOrientation() {
+        window.addEventListener('deviceorientation', (event) => {
+            const heading = event.alpha;
+            if (heading == null || isNaN(heading)) return;
+
+            const userPos = userMarker.getLngLat();
+            const bearing = 360 - heading;
+            const length = 0.05;
+
+            const center = [userPos.lng, userPos.lat];
+            const point1 = turf.destination(center, length, bearing, { units: 'kilometers' }).geometry.coordinates;
+            const point2 = turf.destination(center, length * 0.4, bearing + 90, { units: 'kilometers' }).geometry.coordinates;
+            const point3 = turf.destination(center, length * 0.4, bearing - 90, { units: 'kilometers' }).geometry.coordinates;
+
+            const triangle = {
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [[point1, point2, point3, point1]]
+                    }
+                }]
+            };
+
+            map.getSource('heading-triangle')?.setData(triangle);
+        });
+    }
 });
-

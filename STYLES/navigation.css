@@ -10,6 +10,9 @@
   max-width: 250px;
   width: 100%; /* ensures responsiveness */
   box-sizing: border-box; /* make padding and border fit inside width */
+  font-family: 'Verdana', sans-serif; /* Customize as needed */
+  font-size: 14px; /* Applies to suggestions by default */
+  color: #333;
 }
 
 .search-box input {
@@ -20,6 +23,9 @@
   border-radius: 3px;
   font-size: 16px;
   box-sizing: border-box; /* critical: includes padding + border in width */
+  font-family: 'Verdana', sans-serif; /* Match with .search-box or use something else */
+  font-size: 16px;
+  color: #000;
 }
 
 .suggestions {

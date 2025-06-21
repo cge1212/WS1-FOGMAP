@@ -40,7 +40,7 @@ const toggleBtn = document.getElementById('styleToggleBtn');
 const indicator = toggleBtn.querySelector('.style-indicator');
 
 function updateIndicator() {
-  indicator.style.backgroundColor = currentStyle === styleDark ? 'black' : 'transparent';
+  indicator.style.backgroundColor = currentStyle === styleDark ? 'black' : 'transparent';  
 }
 
 toggleBtn.addEventListener('click', () => {
@@ -51,6 +51,22 @@ toggleBtn.addEventListener('click', () => {
   map.once('styledata', () => {
     addCustomLayers(map);
   });
+});
+
+let arrowToggleActive = true; 
+
+const styleArrowBtn = document.getElementById('styleArrowBtn');
+const arrowIndicator = document.querySelector('#styleArrowBtn .arrow-indicator');
+
+function updateArrowIndicator() {
+  arrowIndicator.style.backgroundColor = arrowToggleActive ? 'blue' : 'transparent';
+}
+
+styleArrowBtn.addEventListener('click', () => {
+  arrowToggleActive = !arrowToggleActive;
+
+  map.setPaintProperty('heading-triangle', 'fill-opacity', arrowToggleActive ? 0.7 : 0.0);
+  updateArrowIndicator();
 });
 
 function createMaskGeoJSON(center, radiusInMeter) {
@@ -247,7 +263,8 @@ function addCustomLayers(map) {
         source: 'heading-triangle',
         paint: {
             'fill-color': 'rgba(0, 102, 255, 0.6)',
-            'fill-outline-color': 'rgba(0, 102, 255, 0.9)'
+            'fill-outline-color': 'rgba(0, 102, 255, 0.9)',
+            'fill-opacity': arrowToggleActive ? 0.7 : 0.0
         }
     });
 }
@@ -412,6 +429,7 @@ searchInput.addEventListener('input', () => {
 
 
             map.getSource('heading-triangle')?.setData(triangle);
+            map.setPaintProperty('heading-triangle', 'fill-opacity', arrowToggleActive ? 0.7 : 0.0);
         });
     }
 });

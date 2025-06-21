@@ -46,7 +46,8 @@
     left: 5%;
     right: auto;
     width: 90%;
-    max-width: 300px;
+    max-width: 100px;
+    top: 10px;
   }
 
   .search-box input {

@@ -47,6 +47,7 @@
   border-left: 14px solid transparent;
   border-right: 14px solid transparent;
   border-top: 24px solid blue;
+  background-color: blue; 
   transition: transform 0.3s;
 }
 

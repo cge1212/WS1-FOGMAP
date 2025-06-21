@@ -56,7 +56,7 @@ toggleBtn.addEventListener('click', () => {
 let arrowToggleActive = true; 
 
 const styleArrowBtn = document.getElementById('styleArrowBtn');
-const arrowIndicator = document.querySelector('#styleArrowBtn .arrow-indicator');
+const arrowIndicator = document.querySelector('.style-triangle');
 
 function updateArrowIndicator() {
   arrowIndicator.style.backgroundColor = arrowToggleActive ? 'blue' : 'transparent';
@@ -404,7 +404,7 @@ searchInput.addEventListener('input', () => {
             const userPos = userMarker.getLngLat();
             const bearing = heading; // Use heading directly, no need to subtract from 360
             const length = 0.04; // smaller main triangle length (~20m)
-            const widthFactor = 0.3; // reduce side width (smaller triangle)
+            const widthFactor = 0.5; // reduce side width (smaller triangle)
 
             // Center point
             const center = [userPos.lng, userPos.lat];

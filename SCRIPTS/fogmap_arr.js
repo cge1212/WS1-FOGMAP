@@ -64,10 +64,21 @@ function updateArrowIndicator() {
 
 styleArrowBtn.addEventListener('click', () => {
   arrowToggleActive = !arrowToggleActive;
-
-  map.setPaintProperty('heading-triangle', 'fill-opacity', arrowToggleActive ? 0.7 : 0.0);
   updateArrowIndicator();
+
+  const layerId = 'heading-triangle-layer';
+
+  if (map.getLayer(layerId)) {
+    map.setPaintProperty(layerId, 'fill-opacity', arrowToggleActive ? 0.7 : 0.0);
+  } else {
+    map.once('idle', () => {
+      if (map.getLayer(layerId)) {
+        map.setPaintProperty(layerId, 'fill-opacity', arrowToggleActive ? 0.7 : 0.0);
+      }
+    });
+  }
 });
+
 
 function createMaskGeoJSON(center, radiusInMeter) {
   const turfCenter = turf.point(center);
@@ -402,7 +413,7 @@ searchInput.addEventListener('input', () => {
             if (heading == null || isNaN(heading)) return;
 
             const userPos = userMarker.getLngLat();
-            const bearing = heading; // Use heading directly, no need to subtract from 360
+            const bearing = 360 - heading; // Use heading directly, no need to subtract from 360
             const length = 0.04; // smaller main triangle length (~20m)
             const widthFactor = 0.5; // reduce side width (smaller triangle)
 

@@ -44,12 +44,13 @@
 @media (max-width: 400px) {
   .search-box {
     left: 5%;
-    right: 5%;
+    right: auto;
     width: 90%;
-    max-width: none;
+    max-width: 300px;
   }
 
   .search-box input {
+    width: 100%;
     font-size: 16px;
   }
 }

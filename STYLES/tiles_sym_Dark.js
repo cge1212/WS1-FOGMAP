@@ -1,4 +1,4 @@
-const styleGM = {
+const styleDark = {
   "version": 8,
   "metadata": {},
   "sources": {

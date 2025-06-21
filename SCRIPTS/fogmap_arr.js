@@ -4,8 +4,8 @@ const radiusMask_upper = 178;
 const navMarker_dist = (radiusMask_lower + 45)/1000;
 
 // toggles
-const styleGM = "https://github.com/cge1212/WS1-FOGMAP/blob/main/STYLES/tiles_sym_Google.json";
-const styleDark = "https://github.com/cge1212/WS1-FOGMAP/blob/main/STYLES/tiles_sym_dark.json";
+import styleGM from '../STYLES/tiles_sym_Google.json' assert { type: 'json' };
+import styleDark from '../STYLES/tiles_sym_Dark.json' assert { type: 'json' };
 // GM as default
 let currentStyle = styleGM;
 

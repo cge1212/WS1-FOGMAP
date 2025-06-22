@@ -46,6 +46,6 @@
   height: 24px;
   border-radius: 50%;
   border: 2px solid blue;
-  background-color: blue;
+  background-color: transparent;
   transition: background-color 0.3s;
 }

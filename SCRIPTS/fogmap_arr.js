@@ -50,7 +50,7 @@ toggleBtn.addEventListener('click', () => {
   });
 });
 
-let arrowToggleActive = true; 
+let arrowToggleActive = false; 
 
 const styleArrowBtn = document.getElementById('styleArrowBtn');
 const arrowIndicator = document.querySelector('.style-triangle');
@@ -75,7 +75,6 @@ styleArrowBtn.addEventListener('click', () => {
     });
   }
 });
-
 
 function createMaskGeoJSON(center, radiusInMeter) {
   const turfCenter = turf.point(center);

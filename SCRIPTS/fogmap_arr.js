@@ -1,4 +1,4 @@
-const defaultPosition = [8.507, 47.408];
+const defaultPosition = [13.333, 52.493]; 
 const radiusMask_lower = 150;
 const radiusMask_upper = 178;
 const navMarker_dist = (radiusMask_lower + 45)/1000;
@@ -17,7 +17,7 @@ const configLowerMask = {
 
 const configUpperMask = {
   innerRadius: radiusMask_upper,
-  color: 'hsl(51, 79.50%, 82.70%)',
+  color: 'hsl(41.54, 65%, 92.16%)',
   ringCount: 4,
   ringWidth: 7,
   opacities: [0.2, 0.4, 0.6, 0.8]
